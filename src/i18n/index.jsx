@@ -1,8 +1,9 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import en from './en';
 import da from './da';
+import de from './de';
 
-const LOCALES = { en, da };
+const LOCALES = { en, da, de };
 
 // ─── Context ─────────────────────────────────────────────────────────────────
 const LanguageContext = createContext({ language: 'en', setLanguage: () => {} });
