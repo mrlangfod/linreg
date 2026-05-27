@@ -47,7 +47,14 @@ export default function CoordinatePlane({
       defs.append('clipPath').attr('id', `clip-${svgRef.current._id}`)
         .append('rect').attr('x', 0).attr('y', 0).attr('width', w).attr('height', h);
 
-      const filter = defs.append('filter').attr('id', `glow-${svgRef.current._id}`);
+      // filterUnits="userSpaceOnUse" + fixed region so the filter works on
+      // zero-height (horizontal) lines — the default objectBoundingBox mode
+      // collapses to zero height when y1===y2 (m=0), hiding the whole line.
+      const filter = defs.append('filter')
+        .attr('id', `glow-${svgRef.current._id}`)
+        .attr('filterUnits', 'userSpaceOnUse')
+        .attr('x', -20).attr('y', -20)
+        .attr('width', w + 40).attr('height', h + 40);
       filter.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'coloredBlur');
       const feMerge = filter.append('feMerge');
       feMerge.append('feMergeNode').attr('in', 'coloredBlur');
