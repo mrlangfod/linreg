@@ -181,16 +181,26 @@ export default function CoordinatePlane({
       }
 
       let line = lineGroup.select('line.main-line');
-      if (line.empty()) {
+      const isNewLine = line.empty();
+
+      if (isNewLine) {
+        // Place immediately on first render — no transition — so the line
+        // starts at its correct position rather than flying in from (0,0).
         line = lineGroup.append('line')
           .attr('class', 'main-line')
-          .attr('stroke-linecap', 'round');
+          .attr('stroke-linecap', 'round')
+          .attr('x1', xScale(x1)).attr('y1', yScale(y1))
+          .attr('x2', xScale(x2)).attr('y2', yScale(y2));
       }
 
       line
         .attr('stroke', lineColor)
         .attr('stroke-width', highlightLine ? 3 : 2.5)
-        .attr('filter', `url(#glow-${svgRef.current._id})`)
+        .attr('filter', `url(#glow-${svgRef.current._id})`);
+
+      // Transition position on every update (no-op on first render since
+      // the values are already set above).
+      line
         .transition().duration(300)
         .attr('x1', xScale(x1)).attr('y1', yScale(y1))
         .attr('x2', xScale(x2)).attr('y2', yScale(y2));
