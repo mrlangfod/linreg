@@ -54,18 +54,15 @@ function PatternPlane({ targetPoints, placedPoints, onPlaneClick, lineRevealed, 
       const root = svg.append('g').attr('class', 'root')
         .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
-      // Grid — skip i=0, axis lines cover x=0 and y=0
+      // Grid lines at every integer — uniform, subtle (skip i=0, axis lines own those)
       d3.range(-AXIS_RANGE, AXIS_RANGE + 1).forEach((i) => {
         if (i === 0) return;
-        const isMajor = i % 5 === 0;
-        const stroke = isMajor ? '#334155' : '#1E293B';
-        const sw = isMajor ? 1 : 0.5;
-        root.append('line').attr('class', isMajor ? 'grid-major' : 'grid-minor')
+        root.append('line')
           .attr('x1', xScale(i)).attr('y1', 0).attr('x2', xScale(i)).attr('y2', h)
-          .attr('stroke', stroke).attr('stroke-width', sw);
-        root.append('line').attr('class', isMajor ? 'grid-major' : 'grid-minor')
+          .attr('stroke', '#334155').attr('stroke-width', 0.5);
+        root.append('line')
           .attr('x1', 0).attr('y1', yScale(i)).attr('x2', w).attr('y2', yScale(i))
-          .attr('stroke', stroke).attr('stroke-width', sw);
+          .attr('stroke', '#334155').attr('stroke-width', 0.5);
       });
 
       // X axis (left → right, arrow at positive end)

@@ -77,22 +77,17 @@ export default function CoordinatePlane({
       // ── Grid ────────────────────────────────────────────────────────────
       const gridG = root.append('g').attr('class', 'grid');
 
-      // Grid lines (skip i=0 — the dedicated axis lines cover x=0 and y=0)
+      // Grid lines at every integer — uniform, subtle (skip i=0, axis lines own those)
       d3.range(-AXIS_RANGE, AXIS_RANGE + 1).forEach((i) => {
         if (i === 0) return;
-        const isMajor = i % 5 === 0;
-        const stroke = isMajor ? '#334155' : '#1E293B';
-        const sw = isMajor ? 1 : 0.5;
         gridG.append('line')
-          .attr('class', isMajor ? 'grid-major' : 'grid-minor')
           .attr('x1', xScale(i)).attr('y1', 0)
           .attr('x2', xScale(i)).attr('y2', h)
-          .attr('stroke', stroke).attr('stroke-width', sw);
+          .attr('stroke', '#334155').attr('stroke-width', 0.5);
         gridG.append('line')
-          .attr('class', isMajor ? 'grid-major' : 'grid-minor')
           .attr('x1', 0).attr('y1', yScale(i))
           .attr('x2', w).attr('y2', yScale(i))
-          .attr('stroke', stroke).attr('stroke-width', sw);
+          .attr('stroke', '#334155').attr('stroke-width', 0.5);
       });
 
       // ── Axes ────────────────────────────────────────────────────────────
