@@ -79,11 +79,13 @@ export default function CoordinatePlane({
       // X axis
       axesG.append('line').attr('class', 'axis-line')
         .attr('x1', 0).attr('y1', yScale(0))
-        .attr('x2', w).attr('y2', yScale(0));
+        .attr('x2', w).attr('y2', yScale(0))
+        .attr('stroke', '#94a3b8').attr('stroke-width', 1.5);
       // Y axis
       axesG.append('line').attr('class', 'axis-line')
         .attr('x1', xScale(0)).attr('y1', 0)
-        .attr('x2', xScale(0)).attr('y2', h);
+        .attr('x2', xScale(0)).attr('y2', h)
+        .attr('stroke', '#94a3b8').attr('stroke-width', 1.5);
 
       // Tick marks + labels
       const tickG = root.append('g').attr('class', 'ticks');
