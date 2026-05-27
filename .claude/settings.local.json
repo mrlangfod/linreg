@@ -9,7 +9,11 @@
       "Bash(curl -fsSL https://deb.nodesource.com/setup_22.x)",
       "Bash(sudo -E bash -)",
       "Bash(sudo apt-get install -y nodejs)",
-      "Bash(gh auth *)"
+      "Bash(gh auth *)",
+      "Bash(gh api *)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'Add GitHub Pages deployment *)",
+      "Bash(git push *)"
     ]
   }
 }
