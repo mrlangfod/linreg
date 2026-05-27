@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /home/henning/code/linreg && if [ -n \"$(git status --porcelain)\" ]; then git add -A && msg=$(git diff --cached --name-only | head -4 | tr '\\n' ',' | sed 's/,$//') && git commit -m \"Auto-commit: $msg\"; fi",
+            "timeout": 15,
+            "statusMessage": "Committing changes..."
+          }
+        ]
+      }
+    ]
+  }
+}
