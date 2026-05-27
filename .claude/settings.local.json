@@ -27,7 +27,10 @@
       "Bash(git commit -m 'Rewrite README with full app documentation *)",
       "Bash(git remote *)",
       "Bash(git commit -m 'Rename repo to linelab *)",
-      "Bash(git commit -m 'Fix line fly-in animation: set initial position without transition *)"
+      "Bash(git commit -m 'Fix line fly-in animation: set initial position without transition *)",
+      "Bash(npm run *)",
+      "Bash(/home/henning/.nvm/versions/node/v22.16.0/bin/npm run *)",
+      "Bash(~/.nvm/versions/node/v22.22.3/bin/npm run *)"
     ]
   }
 }
