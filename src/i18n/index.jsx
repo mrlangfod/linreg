@@ -12,7 +12,7 @@ const LanguageContext = createContext({ language: 'en', setLanguage: () => {} })
 export function LanguageProvider({ children }) {
   const [language, setLanguage] = useState(() => {
     // Persist preference in localStorage
-    return localStorage.getItem('linelab-lang') || 'en';
+    return localStorage.getItem('linelab-lang') || 'da';
   });
 
   const handleSetLanguage = useCallback((lang) => {

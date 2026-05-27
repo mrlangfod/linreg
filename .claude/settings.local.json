@@ -22,7 +22,8 @@
       "Bash(git -C /home/henning/code/linreg status --porcelain)",
       "Bash(git commit -m 'Add Stop hook for auto-commits after each change *)",
       "Bash(git commit -m 'Clean up stale permission entries in settings.local.json *)",
-      "Bash(git commit -m 'Split hook and permissions into separate settings files *)"
+      "Bash(git commit -m 'Split hook and permissions into separate settings files *)",
+      "Bash(git commit -m 'Set Danish as the default language *)"
     ]
   }
 }
