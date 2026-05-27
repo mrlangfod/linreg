@@ -2,7 +2,7 @@
 
 An interactive web app for teaching linear functions (y = mx + b) to middle-school students. Built to be visually engaging and fun without being childish — bright colours, smooth animations, and real-world problems that make the maths feel meaningful.
 
-🌐 **Live app:** [mrlangfod.github.io/linreg](https://mrlangfod.github.io/linreg/)
+🌐 **Live app:** [mrlangfod.github.io/linelab](https://mrlangfod.github.io/linelab/)
 
 ---
 

@@ -24,7 +24,9 @@
       "Bash(git commit -m 'Clean up stale permission entries in settings.local.json *)",
       "Bash(git commit -m 'Split hook and permissions into separate settings files *)",
       "Bash(git commit -m 'Set Danish as the default language *)",
-      "Bash(git commit -m 'Rewrite README with full app documentation *)"
+      "Bash(git commit -m 'Rewrite README with full app documentation *)",
+      "Bash(git remote *)",
+      "Bash(git commit -m 'Rename repo to linelab *)"
     ]
   }
 }
