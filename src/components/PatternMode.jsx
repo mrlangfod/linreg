@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as d3 from 'd3';
 import { PATTERN_SETS } from '../constants';
+import { useTranslation } from '../i18n';
 
 const MARGIN = { top: 20, right: 20, bottom: 40, left: 40 };
 const AXIS_RANGE = 10;
@@ -39,32 +40,25 @@ function PatternPlane({ targetPoints, placedPoints, onPlaneClick, lineRevealed, 
       const root = svg.append('g').attr('class', 'root')
         .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
-      // Grid
       d3.range(-AXIS_RANGE, AXIS_RANGE + 1).forEach((i) => {
         const isMajor = i % 5 === 0;
-        root.append('line')
-          .attr('class', isMajor ? 'grid-major' : 'grid-minor')
+        root.append('line').attr('class', isMajor ? 'grid-major' : 'grid-minor')
           .attr('x1', xScale(i)).attr('y1', 0).attr('x2', xScale(i)).attr('y2', h);
-        root.append('line')
-          .attr('class', isMajor ? 'grid-major' : 'grid-minor')
+        root.append('line').attr('class', isMajor ? 'grid-major' : 'grid-minor')
           .attr('x1', 0).attr('y1', yScale(i)).attr('x2', w).attr('y2', yScale(i));
       });
 
-      // Axes
       root.append('line').attr('class', 'axis-line')
         .attr('x1', 0).attr('y1', yScale(0)).attr('x2', w).attr('y2', yScale(0));
       root.append('line').attr('class', 'axis-line')
         .attr('x1', xScale(0)).attr('y1', 0).attr('x2', xScale(0)).attr('y2', h);
 
-      // Labels
       d3.range(-AXIS_RANGE, AXIS_RANGE + 1).forEach((i) => {
         if (i === 0) return;
-        root.append('text')
-          .attr('x', xScale(i)).attr('y', yScale(0) + 18)
+        root.append('text').attr('x', xScale(i)).attr('y', yScale(0) + 18)
           .attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', '#64748b')
           .text(i % 5 === 0 || Math.abs(i) <= 3 ? i : '');
-        root.append('text')
-          .attr('x', xScale(0) - 8).attr('y', yScale(i) + 4)
+        root.append('text').attr('x', xScale(0) - 8).attr('y', yScale(i) + 4)
           .attr('text-anchor', 'end').attr('font-size', 10).attr('fill', '#64748b')
           .text(i % 5 === 0 || Math.abs(i) <= 3 ? i : '');
       });
@@ -74,19 +68,13 @@ function PatternPlane({ targetPoints, placedPoints, onPlaneClick, lineRevealed, 
       root.append('text').attr('x', xScale(0) + 8).attr('y', 12)
         .attr('fill', '#94a3b8').attr('font-size', 13).attr('font-weight', 700).text('y');
 
-      // Line group
       root.append('g').attr('class', 'reveal-line-g').attr('clip-path', 'url(#pat-clip)');
-      // Target points group
       root.append('g').attr('class', 'target-pts-g').attr('clip-path', 'url(#pat-clip)');
-      // Placed points group
       root.append('g').attr('class', 'placed-pts-g').attr('clip-path', 'url(#pat-clip)');
 
-      // Click overlay
-      root.append('rect')
-        .attr('class', 'click-overlay')
+      root.append('rect').attr('class', 'click-overlay')
         .attr('x', 0).attr('y', 0).attr('width', w).attr('height', h)
-        .attr('fill', 'transparent')
-        .attr('cursor', 'crosshair')
+        .attr('fill', 'transparent').attr('cursor', 'crosshair')
         .on('click', function (event) {
           const [px, py] = d3.pointer(event);
           const mathX = Math.round(xScale.invert(px));
@@ -102,18 +90,14 @@ function PatternPlane({ targetPoints, placedPoints, onPlaneClick, lineRevealed, 
 
     const root = svg.select('g.root');
 
-    // ── Target points (dim, showing what to find) ────────────────────────
+    // Target points
     const targetG = root.select('g.target-pts-g');
     const tPts = targetG.selectAll('g.target-pt').data(targetPoints, (d) => `${d.x},${d.y}`);
     tPts.enter().append('g').attr('class', 'target-pt').each(function (d) {
       d3.select(this).append('circle')
-        .attr('cx', xScale(d.x)).attr('cy', yScale(d.y))
-        .attr('r', 7)
-        .attr('fill', 'none')
-        .attr('stroke', '#FCD34D')
-        .attr('stroke-width', 2)
-        .attr('stroke-dasharray', '3,2')
-        .attr('opacity', 0.7);
+        .attr('cx', xScale(d.x)).attr('cy', yScale(d.y)).attr('r', 7)
+        .attr('fill', 'none').attr('stroke', '#FCD34D').attr('stroke-width', 2)
+        .attr('stroke-dasharray', '3,2').attr('opacity', 0.7);
       d3.select(this).append('text')
         .attr('x', xScale(d.x) + 10).attr('y', yScale(d.y) - 8)
         .attr('font-size', 11).attr('fill', '#FCD34D').attr('font-weight', 700)
@@ -121,36 +105,30 @@ function PatternPlane({ targetPoints, placedPoints, onPlaneClick, lineRevealed, 
     });
     tPts.exit().remove();
 
-    // ── Placed points ────────────────────────────────────────────────────
+    // Placed points
     const placedG = root.select('g.placed-pts-g');
     const pPts = placedG.selectAll('g.placed-pt').data(placedPoints, (d) => `${d.x},${d.y}`);
-
-    const enterPts = pPts.enter().append('g').attr('class', 'placed-pt');
-    enterPts.each(function (d) {
+    pPts.enter().append('g').attr('class', 'placed-pt').each(function (d) {
       const g = d3.select(this);
       const cx = xScale(d.x), cy = yScale(d.y);
-      // Pulse ring
-      g.append('circle').attr('cx', cx).attr('cy', cy)
-        .attr('r', 7).attr('fill', 'none').attr('stroke', '#2DD4BF').attr('stroke-width', 2).attr('opacity', 0.8)
+      g.append('circle').attr('cx', cx).attr('cy', cy).attr('r', 7)
+        .attr('fill', 'none').attr('stroke', '#2DD4BF').attr('stroke-width', 2).attr('opacity', 0.8)
         .transition().duration(600).attr('r', 18).attr('opacity', 0).remove();
-      // Dot
-      g.append('circle').attr('cx', cx).attr('cy', cy)
-        .attr('r', 0).attr('fill', '#2DD4BF').attr('stroke', 'white').attr('stroke-width', 1.5)
+      g.append('circle').attr('cx', cx).attr('cy', cy).attr('r', 0)
+        .attr('fill', '#2DD4BF').attr('stroke', 'white').attr('stroke-width', 1.5)
         .transition().duration(400).ease(d3.easeBounceOut).attr('r', 7);
     });
     pPts.exit().remove();
 
-    // ── Reveal line ──────────────────────────────────────────────────────
+    // Reveal line
     const lineG = root.select('g.reveal-line-g');
     lineG.selectAll('*').remove();
-
     if (lineRevealed && patternSet) {
       const { m, b } = patternSet;
       let x1 = -AXIS_RANGE, x2 = AXIS_RANGE;
       let y1 = m * x1 + b, y2 = m * x2 + b;
       if (m !== 0) {
-        const xa = (-AXIS_RANGE - b) / m;
-        const xb = (AXIS_RANGE - b) / m;
+        const xa = (-AXIS_RANGE - b) / m, xb = (AXIS_RANGE - b) / m;
         x1 = Math.max(-AXIS_RANGE, Math.min(AXIS_RANGE, Math.min(xa, xb)));
         x2 = Math.max(-AXIS_RANGE, Math.min(AXIS_RANGE, Math.max(xa, xb)));
         y1 = m * x1 + b; y2 = m * x2 + b;
@@ -161,13 +139,10 @@ function PatternPlane({ targetPoints, placedPoints, onPlaneClick, lineRevealed, 
       lineG.append('line')
         .attr('x1', xScale(x1)).attr('y1', yScale(y1))
         .attr('x2', xScale(x2)).attr('y2', yScale(y2))
-        .attr('stroke', '#2DD4BF')
-        .attr('stroke-width', 2.5)
-        .attr('stroke-dasharray', len)
-        .attr('stroke-dashoffset', len)
+        .attr('stroke', '#2DD4BF').attr('stroke-width', 2.5)
+        .attr('stroke-dasharray', len).attr('stroke-dashoffset', len)
         .attr('filter', 'url(#pat-glow)')
-        .transition().duration(800).ease(d3.easeLinear)
-        .attr('stroke-dashoffset', 0);
+        .transition().duration(800).ease(d3.easeLinear).attr('stroke-dashoffset', 0);
     }
   }, [targetPoints, placedPoints, lineRevealed, patternSet, onPlaneClick]);
 
@@ -193,6 +168,7 @@ export default function PatternMode() {
   const [setIdx, setSetIdx] = useState(0);
   const [placedPoints, setPlacedPoints] = useState([]);
   const [lineRevealed, setLineRevealed] = useState(false);
+  const { t } = useTranslation();
 
   const patternSet = PATTERN_SETS[setIdx];
   const targetPoints = patternSet.points;
@@ -200,26 +176,16 @@ export default function PatternMode() {
 
   const handlePlaneClick = useCallback((x, y) => {
     if (lineRevealed) return;
-    // Check if this matches a target point
     const match = targetPoints.find(
       (tp) => tp.x === x && tp.y === y &&
         !placedPoints.some((pp) => pp.x === x && pp.y === y)
     );
-    if (match) {
-      setPlacedPoints((prev) => [...prev, { x, y }]);
-    }
+    if (match) setPlacedPoints((prev) => [...prev, { x, y }]);
   }, [targetPoints, placedPoints, lineRevealed]);
 
-  const resetSet = (idx) => {
-    setSetIdx(idx);
-    setPlacedPoints([]);
-    setLineRevealed(false);
-  };
+  const resetSet = (idx) => { setSetIdx(idx); setPlacedPoints([]); setLineRevealed(false); };
 
-  const fmt = (n) => {
-    if (Number.isInteger(n)) return n;
-    return parseFloat(n.toFixed(2));
-  };
+  const fmt = (n) => (Number.isInteger(n) ? n : parseFloat(n.toFixed(2)));
 
   const buildEquation = (m, b) => {
     const mV = fmt(m), bV = fmt(b);
@@ -234,83 +200,65 @@ export default function PatternMode() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -16 }}
-      transition={{ duration: 0.3 }}
+      initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.3 }}
       className="flex flex-col gap-4"
     >
-      {/* Header */}
       <div>
-        <h2 className="text-2xl font-extrabold text-white">🔢 Pattern Builder</h2>
-        <p className="text-slate-400 text-sm mt-0.5">Click the points shown on the graph to plot them, then reveal the line!</p>
+        <h2 className="text-2xl font-extrabold text-white">{t('pattern.title')}</h2>
+        <p className="text-slate-400 text-sm mt-0.5">{t('pattern.subtitle')}</p>
       </div>
 
       {/* Level selector */}
       <div className="flex gap-2 flex-wrap">
         {PATTERN_SETS.map((ps, i) => (
-          <button
-            key={ps.id}
-            onClick={() => resetSet(i)}
-            aria-label={ps.label}
+          <button key={ps.id} onClick={() => resetSet(i)}
+            aria-label={t(`pattern.levels.${ps.id}`)}
             aria-current={i === setIdx ? 'true' : undefined}
             className="px-4 py-2 rounded-xl text-sm font-bold min-h-[44px] transition-all duration-200"
             style={{
               background: i === setIdx ? '#2DD4BF' : '#1E293B',
               color: i === setIdx ? '#0F172A' : '#94a3b8',
               border: `1.5px solid ${i === setIdx ? '#2DD4BF' : '#334155'}`,
-            }}
-          >
-            {ps.label}
+            }}>
+            {t(`pattern.levels.${ps.id}`)}
           </button>
         ))}
       </div>
 
       <AnimatePresence mode="wait">
-        <motion.div
-          key={setIdx}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -20 }}
-          transition={{ duration: 0.25 }}
+        <motion.div key={setIdx}
+          initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}
           className="flex flex-col lg:flex-row gap-4"
         >
           {/* Graph */}
-          <div
-            className="flex-1 rounded-2xl p-3 min-w-0"
-            style={{ background: '#1E293B', border: '1px solid #334155' }}
-          >
+          <div className="flex-1 rounded-2xl p-3 min-w-0"
+            style={{ background: '#1E293B', border: '1px solid #334155' }}>
             <PatternPlane
-              targetPoints={targetPoints}
-              placedPoints={placedPoints}
-              onPlaneClick={handlePlaneClick}
-              lineRevealed={lineRevealed}
-              patternSet={patternSet}
+              targetPoints={targetPoints} placedPoints={placedPoints}
+              onPlaneClick={handlePlaneClick} lineRevealed={lineRevealed} patternSet={patternSet}
             />
           </div>
 
           {/* Side panel */}
           <div className="flex flex-col gap-4 w-full lg:w-72 shrink-0">
-
-            {/* Instructions */}
-            <div
-              className="rounded-2xl p-4"
-              style={{ background: '#1E293B', border: '1px solid #334155' }}
-            >
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Points to Plot</p>
+            {/* Points to plot */}
+            <div className="rounded-2xl p-4" style={{ background: '#1E293B', border: '1px solid #334155' }}>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
+                {t('pattern.pointsToPlot')}
+              </p>
               <div className="grid grid-cols-2 gap-2">
                 {targetPoints.map((pt) => {
                   const placed = placedPoints.some((pp) => pp.x === pt.x && pp.y === pt.y);
                   return (
-                    <div
-                      key={`${pt.x},${pt.y}`}
+                    <div key={`${pt.x},${pt.y}`}
                       className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-bold"
                       style={{
                         background: placed ? '#134e4a' : '#0F172A',
                         border: `1.5px solid ${placed ? '#2DD4BF' : '#334155'}`,
                         color: placed ? '#2DD4BF' : '#94a3b8',
-                      }}
-                    >
+                      }}>
                       {placed ? '✓' : '○'}
                       <span>({pt.x}, {pt.y})</span>
                     </div>
@@ -320,37 +268,27 @@ export default function PatternMode() {
             </div>
 
             {/* Progress */}
-            <div
-              className="rounded-2xl p-4"
-              style={{ background: '#1E293B', border: '1px solid #334155' }}
-            >
+            <div className="rounded-2xl p-4" style={{ background: '#1E293B', border: '1px solid #334155' }}>
               <div className="flex justify-between items-center mb-2">
-                <span className="text-sm font-bold text-slate-400">Progress</span>
+                <span className="text-sm font-bold text-slate-400">{t('pattern.progress')}</span>
                 <span className="font-extrabold text-white">{placedPoints.length} / {targetPoints.length}</span>
               </div>
               <div className="w-full h-3 rounded-full overflow-hidden" style={{ background: '#334155' }}>
-                <motion.div
-                  className="h-full rounded-full"
-                  style={{ background: '#2DD4BF' }}
+                <motion.div className="h-full rounded-full" style={{ background: '#2DD4BF' }}
                   animate={{ width: `${(placedPoints.length / targetPoints.length) * 100}%` }}
-                  transition={{ duration: 0.3 }}
-                />
+                  transition={{ duration: 0.3 }} />
               </div>
             </div>
 
             {/* Reveal button */}
             <AnimatePresence>
               {allPlaced && !lineRevealed && (
-                <motion.button
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                <motion.button initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.9 }}
-                  onClick={() => setLineRevealed(true)}
-                  aria-label="Reveal the line"
+                  onClick={() => setLineRevealed(true)} aria-label={t('pattern.revealBtn')}
                   className="w-full py-3 rounded-2xl font-extrabold text-lg min-h-[52px]"
-                  style={{ background: '#FCD34D', color: '#0F172A' }}
-                >
-                  ✨ Reveal the Line!
+                  style={{ background: '#FCD34D', color: '#0F172A' }}>
+                  {t('pattern.revealBtn')}
                 </motion.button>
               )}
             </AnimatePresence>
@@ -358,45 +296,35 @@ export default function PatternMode() {
             {/* Revealed equation */}
             <AnimatePresence>
               {lineRevealed && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
                   className="rounded-2xl p-5 text-center"
-                  style={{ background: '#1E293B', border: '2px solid #2DD4BF' }}
-                >
-                  <p className="text-slate-400 text-sm font-bold mb-2">The equation is:</p>
-                  <p
-                    className="text-3xl font-black"
-                    style={{ color: '#2DD4BF' }}
-                  >
+                  style={{ background: '#1E293B', border: '2px solid #2DD4BF' }}>
+                  <p className="text-slate-400 text-sm font-bold mb-2">{t('pattern.equationIs')}</p>
+                  <p className="text-3xl font-black" style={{ color: '#2DD4BF' }}>
                     {buildEquation(patternSet.m, patternSet.b)}
                   </p>
                   <p className="text-slate-400 text-xs mt-3">
-                    Slope = <span style={{ color: '#2DD4BF' }}>{fmt(patternSet.m)}</span> &nbsp;|&nbsp;
-                    Intercept = <span style={{ color: '#FCD34D' }}>{fmt(patternSet.b)}</span>
+                    {t('pattern.slope')} = <span style={{ color: '#2DD4BF' }}>{fmt(patternSet.m)}</span>
+                    {' '}&nbsp;|&nbsp;{' '}
+                    {t('pattern.intercept')} = <span style={{ color: '#FCD34D' }}>{fmt(patternSet.b)}</span>
                   </p>
-                  <button
-                    onClick={() => resetSet((setIdx + 1) % PATTERN_SETS.length)}
-                    aria-label="Try next pattern"
+                  <button onClick={() => resetSet((setIdx + 1) % PATTERN_SETS.length)}
+                    aria-label={t('pattern.nextLevel')}
                     className="mt-4 px-5 py-2 rounded-xl text-sm font-bold min-h-[44px]"
-                    style={{ background: '#2DD4BF', color: '#0F172A' }}
-                  >
-                    Try Next Level →
+                    style={{ background: '#2DD4BF', color: '#0F172A' }}>
+                    {t('pattern.nextLevel')}
                   </button>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Hint */}
+            {/* How to play */}
             {!allPlaced && (
-              <div
-                className="rounded-2xl p-4"
-                style={{ background: '#1E293B', border: '1px solid #334155' }}
-              >
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">How to play</p>
-                <p className="text-slate-400 text-sm leading-relaxed">
-                  Click on the coordinate plane where you see the dashed circles to place each point. Match all 6!
+              <div className="rounded-2xl p-4" style={{ background: '#1E293B', border: '1px solid #334155' }}>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  {t('pattern.howToPlay')}
                 </p>
+                <p className="text-slate-400 text-sm leading-relaxed">{t('pattern.howToPlayText')}</p>
               </div>
             )}
           </div>

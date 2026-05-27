@@ -1,20 +1,19 @@
 import { useMemo } from 'react';
+import { useTranslation } from '../i18n';
 
 /**
  * useLinearFunction(m, b)
- * Returns derived data for the linear function y = mx + b
+ * Returns derived data for y = mx + b, with descriptions in the active language.
  */
 export function useLinearFunction(m, b) {
+  const { t } = useTranslation();
+
   return useMemo(() => {
-    // Equation string
-    const formatNum = (n) => {
-      if (Number.isInteger(n)) return n;
-      return parseFloat(n.toFixed(2));
-    };
+    const fmt = (n) => (Number.isInteger(n) ? n : parseFloat(n.toFixed(2)));
+    const mVal = fmt(m);
+    const bVal = fmt(b);
 
-    const mVal = formatNum(m);
-    const bVal = formatNum(b);
-
+    // ── Equation string ────────────────────────────────────────────────────
     let equation = 'y = ';
     if (mVal === 0) {
       equation += `${bVal}`;
@@ -29,45 +28,31 @@ export function useLinearFunction(m, b) {
       if (bVal !== 0) equation += bVal > 0 ? ` + ${bVal}` : ` − ${Math.abs(bVal)}`;
     }
 
-    // Plain English description
-    let plainEnglish = '';
+    // ── Plain-language description ─────────────────────────────────────────
+    let plainEnglish;
     if (m === 0) {
-      plainEnglish = `This is a flat (horizontal) line. It doesn't go up or down — y is always ${bVal}.`;
-    } else if (m > 0) {
-      const riseText = m === 1 ? '1 step' : `${mVal} steps`;
-      plainEnglish = `For every step to the right, the line goes UP ${riseText}.`;
+      plainEnglish = t('lineDesc.flat', { value: bVal });
     } else {
-      const riseText = Math.abs(m) === 1 ? '1 step' : `${Math.abs(mVal)} steps`;
-      plainEnglish = `For every step to the right, the line goes DOWN ${riseText}.`;
+      const absM = Math.abs(mVal);
+      const steps = absM === 1 ? t('lineDesc.step1') : t('lineDesc.stepN', { n: absM });
+      plainEnglish = m > 0
+        ? t('lineDesc.up',   { steps })
+        : t('lineDesc.down', { steps });
     }
 
     const interceptText =
       b === 0
-        ? 'The line passes right through the origin (0, 0).'
+        ? t('lineDesc.interceptZero')
         : b > 0
-        ? `The line crosses the y-axis at +${bVal}.`
-        : `The line crosses the y-axis at ${bVal}.`;
+        ? t('lineDesc.interceptPositive', { b: bVal })
+        : t('lineDesc.interceptNegative', { b: bVal });
 
-    // Table of 5 x/y pairs
-    const tableXValues = [-2, -1, 0, 1, 2];
-    const points = tableXValues.map((x) => ({
+    // ── Table of 5 x/y pairs ──────────────────────────────────────────────
+    const points = [-2, -1, 0, 1, 2].map((x) => ({
       x,
       y: parseFloat((m * x + b).toFixed(2)),
     }));
 
-    // Extended points for drawing the line across -10 to 10
-    const linePoints = [-10, 10].map((x) => ({
-      x,
-      y: m * x + b,
-    }));
-
-    return {
-      equation,
-      equationParts: { m: mVal, b: bVal },
-      plainEnglish,
-      interceptText,
-      points,
-      linePoints,
-    };
-  }, [m, b]);
+    return { equation, equationParts: { m: mVal, b: bVal }, plainEnglish, interceptText, points };
+  }, [m, b, t]);
 }

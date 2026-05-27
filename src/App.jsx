@@ -1,24 +1,25 @@
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { LanguageProvider } from './i18n';
+import { useTranslation } from './i18n';
 import ModeNav from './components/ModeNav';
+import LanguageSwitcher from './components/LanguageSwitcher';
 import ExploreMode from './components/ExploreMode';
 import StoryMode from './components/StoryMode';
 import PatternMode from './components/PatternMode';
 import QuizMode from './components/QuizMode';
 
-export default function App() {
+function AppInner() {
   const [activeMode, setActiveMode] = useState('explore');
   const [completedStories, setCompletedStories] = useState(new Set());
+  const { t } = useTranslation();
 
   const handleStoryComplete = (id) => {
     setCompletedStories((prev) => new Set([...prev, id]));
   };
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ background: '#0F172A', fontFamily: "'Nunito', sans-serif" }}
-    >
+    <div className="min-h-screen" style={{ background: '#0F172A', fontFamily: "'Nunito', sans-serif" }}>
       {/* Top bar */}
       <header
         className="sticky top-0 z-40 px-4 py-3"
@@ -33,21 +34,23 @@ export default function App() {
           <div className="flex items-center gap-2 shrink-0">
             <span className="text-2xl">📈</span>
             <div>
-              <h1
-                className="text-lg font-black leading-none"
-                style={{ color: '#2DD4BF' }}
-              >
-                LineLab
+              <h1 className="text-lg font-black leading-none" style={{ color: '#2DD4BF' }}>
+                {t('app.title')}
               </h1>
               <p className="text-xs leading-none" style={{ color: '#475569' }}>
-                Linear Functions Explorer
+                {t('app.subtitle')}
               </p>
             </div>
           </div>
 
           {/* Nav */}
-          <div className="w-full sm:flex-1">
+          <div className="flex-1 w-full">
             <ModeNav activeMode={activeMode} onModeChange={setActiveMode} />
+          </div>
+
+          {/* Language switcher */}
+          <div className="shrink-0">
+            <LanguageSwitcher />
           </div>
         </div>
       </header>
@@ -56,35 +59,33 @@ export default function App() {
       <main className="max-w-4xl mx-auto px-4 py-6">
         <AnimatePresence mode="wait">
           {activeMode === 'explore' && (
-            <motion.div key="explore">
-              <ExploreMode />
-            </motion.div>
+            <motion.div key="explore"><ExploreMode /></motion.div>
           )}
           {activeMode === 'story' && (
             <motion.div key="story">
-              <StoryMode
-                completedChallenges={completedStories}
-                onComplete={handleStoryComplete}
-              />
+              <StoryMode completedChallenges={completedStories} onComplete={handleStoryComplete} />
             </motion.div>
           )}
           {activeMode === 'pattern' && (
-            <motion.div key="pattern">
-              <PatternMode />
-            </motion.div>
+            <motion.div key="pattern"><PatternMode /></motion.div>
           )}
           {activeMode === 'quiz' && (
-            <motion.div key="quiz">
-              <QuizMode />
-            </motion.div>
+            <motion.div key="quiz"><QuizMode /></motion.div>
           )}
         </AnimatePresence>
       </main>
 
-      {/* Footer */}
       <footer className="text-center py-6 text-xs" style={{ color: '#334155' }}>
-        LineLab — Learn linear functions the fun way 📐
+        {t('app.footer')}
       </footer>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <AppInner />
+    </LanguageProvider>
   );
 }
