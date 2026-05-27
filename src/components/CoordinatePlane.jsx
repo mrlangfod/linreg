@@ -70,8 +70,9 @@ export default function CoordinatePlane({
       // ── Grid ────────────────────────────────────────────────────────────
       const gridG = root.append('g').attr('class', 'grid');
 
-      // Minor grid (every 1 unit)
+      // Grid lines (skip i=0 — the dedicated axis lines cover x=0 and y=0)
       d3.range(-AXIS_RANGE, AXIS_RANGE + 1).forEach((i) => {
+        if (i === 0) return;
         const isMajor = i % 5 === 0;
         const stroke = isMajor ? '#334155' : '#1E293B';
         const sw = isMajor ? 1 : 0.5;
@@ -94,13 +95,13 @@ export default function CoordinatePlane({
       axesG.append('line').attr('class', 'axis-line')
         .attr('x1', 0).attr('y1', yScale(0))
         .attr('x2', w).attr('y2', yScale(0))
-        .attr('stroke', '#94a3b8').attr('stroke-width', 1.5)
+        .attr('stroke', '#94a3b8').attr('stroke-width', 2)
         .attr('marker-end', `url(#arrow-${svgRef.current._id})`);
       // Y axis (bottom → top, arrow at positive end)
       axesG.append('line').attr('class', 'axis-line')
         .attr('x1', xScale(0)).attr('y1', h)
         .attr('x2', xScale(0)).attr('y2', 0)
-        .attr('stroke', '#94a3b8').attr('stroke-width', 1.5)
+        .attr('stroke', '#94a3b8').attr('stroke-width', 2)
         .attr('marker-end', `url(#arrow-${svgRef.current._id})`);
 
       // Tick marks + labels
