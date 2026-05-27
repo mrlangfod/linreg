@@ -47,11 +47,6 @@ function AppInner() {
           <div className="flex-1 w-full">
             <ModeNav activeMode={activeMode} onModeChange={setActiveMode} />
           </div>
-
-          {/* Language switcher */}
-          <div className="shrink-0">
-            <LanguageSwitcher />
-          </div>
         </div>
       </header>
 
@@ -75,8 +70,9 @@ function AppInner() {
         </AnimatePresence>
       </main>
 
-      <footer className="text-center py-6 text-xs" style={{ color: '#334155' }}>
-        {t('app.footer')}
+      <footer className="py-6 text-xs flex flex-col items-center gap-3" style={{ color: '#334155' }}>
+        <LanguageSwitcher />
+        <span>{t('app.footer')}</span>
       </footer>
     </div>
   );
