@@ -7,7 +7,10 @@ import { useTranslation } from '../i18n';
 const MARGIN = { top: 20, right: 20, bottom: 40, left: 40 };
 const AXIS_RANGE = 10;
 
-function PatternPlane({ targetPoints, placedPoints, onPlaneClick, lineRevealed, patternSet }) {
+// How many dashed-circle hints to show per level (6 points total)
+const HINTS_BY_LEVEL = { 1: 6, 2: 4, 3: 2, 4: 0 };
+
+function PatternPlane({ targetPoints, placedPoints, onPlaneClick, lineRevealed, patternSet, visibleHintCount }) {
   const containerRef = useRef(null);
   const svgRef = useRef(null);
 
@@ -90,9 +93,10 @@ function PatternPlane({ targetPoints, placedPoints, onPlaneClick, lineRevealed, 
 
     const root = svg.select('g.root');
 
-    // Target points
+    // Target points — only show dashed-circle hints for the first `visibleHintCount` points
+    const hintPoints = targetPoints.slice(0, visibleHintCount ?? targetPoints.length);
     const targetG = root.select('g.target-pts-g');
-    const tPts = targetG.selectAll('g.target-pt').data(targetPoints, (d) => `${d.x},${d.y}`);
+    const tPts = targetG.selectAll('g.target-pt').data(hintPoints, (d) => `${d.x},${d.y}`);
     tPts.enter().append('g').attr('class', 'target-pt').each(function (d) {
       d3.select(this).append('circle')
         .attr('cx', xScale(d.x)).attr('cy', yScale(d.y)).attr('r', 7)
@@ -144,7 +148,7 @@ function PatternPlane({ targetPoints, placedPoints, onPlaneClick, lineRevealed, 
         .attr('filter', 'url(#pat-glow)')
         .transition().duration(800).ease(d3.easeLinear).attr('stroke-dashoffset', 0);
     }
-  }, [targetPoints, placedPoints, lineRevealed, patternSet, onPlaneClick]);
+  }, [targetPoints, placedPoints, lineRevealed, patternSet, onPlaneClick, visibleHintCount]);
 
   useEffect(() => { draw(); }, [draw]);
   useEffect(() => {
@@ -238,6 +242,7 @@ export default function PatternMode() {
             <PatternPlane
               targetPoints={targetPoints} placedPoints={placedPoints}
               onPlaneClick={handlePlaneClick} lineRevealed={lineRevealed} patternSet={patternSet}
+              visibleHintCount={HINTS_BY_LEVEL[patternSet.id]}
             />
           </div>
 
