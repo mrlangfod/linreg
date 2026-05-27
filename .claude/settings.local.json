@@ -13,7 +13,14 @@
       "Bash(gh api *)",
       "Bash(git add *)",
       "Bash(git commit -m 'Add GitHub Pages deployment *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(gh workflow *)",
+      "Bash(gh run *)",
+      "Skill(update-config)",
+      "Bash(bash -c ' *)",
+      "Bash(echo \"# LineLab\")",
+      "Bash(git -C /home/henning/code/linreg status --porcelain)",
+      "Bash(git commit -m 'Add Stop hook for auto-commits after each change *)"
     ]
   }
 }
