@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Read(//usr/bin/**)",
+      "Read(//usr/local/bin/**)",
+      "Bash(nvm list *)",
+      "Read(//home/henning/.nvm/versions/**)",
+      "Bash(curl -fsSL https://deb.nodesource.com/setup_22.x)",
+      "Bash(sudo -E bash -)",
+      "Bash(sudo apt-get install -y nodejs)",
+      "Bash(gh auth *)"
+    ]
+  }
+}

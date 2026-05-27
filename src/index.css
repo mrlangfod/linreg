@@ -1,0 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+:root {
+  --color-navy: #0F172A;
+  --color-teal: #2DD4BF;
+  --color-yellow: #FCD34D;
+  --color-slate: #1E293B;
+  --color-slate2: #334155;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-navy);
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  text-align: left;
+}
+
+/* Slider styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  background: #334155;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #2DD4BF;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(45, 212, 191, 0.6);
+  transition: box-shadow 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 14px rgba(45, 212, 191, 0.9);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #2DD4BF;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 8px rgba(45, 212, 191, 0.6);
+}
+
+/* Glow utilities */
+.glow-teal {
+  text-shadow: 0 0 12px rgba(45, 212, 191, 0.8);
+}
+
+.glow-yellow {
+  text-shadow: 0 0 12px rgba(252, 211, 77, 0.8);
+}
+
+/* Confetti particle */
+@keyframes confettiFall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.confetti-particle {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  animation: confettiFall linear forwards;
+  z-index: 9999;
+  pointer-events: none;
+}
