@@ -42,7 +42,7 @@ export default function CoordinatePlane({
         .attr('width', totalWidth)
         .attr('height', totalHeight);
 
-      // Defs — clip path + glow filter
+      // Defs — clip path + glow filter + arrowhead marker
       const defs = svg.append('defs');
       defs.append('clipPath').attr('id', `clip-${svgRef.current._id}`)
         .append('rect').attr('x', 0).attr('y', 0).attr('width', w).attr('height', h);
@@ -52,6 +52,16 @@ export default function CoordinatePlane({
       const feMerge = filter.append('feMerge');
       feMerge.append('feMergeNode').attr('in', 'coloredBlur');
       feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+      defs.append('marker')
+        .attr('id', `arrow-${svgRef.current._id}`)
+        .attr('viewBox', '0 0 10 10')
+        .attr('refX', 10).attr('refY', 5)
+        .attr('markerWidth', 6).attr('markerHeight', 6)
+        .attr('orient', 'auto')
+        .append('path')
+        .attr('d', 'M 0 0 L 10 5 L 0 10 z')
+        .attr('fill', '#94a3b8');
 
       const root = svg.append('g')
         .attr('class', 'root')
@@ -63,29 +73,35 @@ export default function CoordinatePlane({
       // Minor grid (every 1 unit)
       d3.range(-AXIS_RANGE, AXIS_RANGE + 1).forEach((i) => {
         const isMajor = i % 5 === 0;
+        const stroke = isMajor ? '#334155' : '#1E293B';
+        const sw = isMajor ? 1 : 0.5;
         gridG.append('line')
           .attr('class', isMajor ? 'grid-major' : 'grid-minor')
           .attr('x1', xScale(i)).attr('y1', 0)
-          .attr('x2', xScale(i)).attr('y2', h);
+          .attr('x2', xScale(i)).attr('y2', h)
+          .attr('stroke', stroke).attr('stroke-width', sw);
         gridG.append('line')
           .attr('class', isMajor ? 'grid-major' : 'grid-minor')
           .attr('x1', 0).attr('y1', yScale(i))
-          .attr('x2', w).attr('y2', yScale(i));
+          .attr('x2', w).attr('y2', yScale(i))
+          .attr('stroke', stroke).attr('stroke-width', sw);
       });
 
       // ── Axes ────────────────────────────────────────────────────────────
       const axesG = root.append('g').attr('class', 'axes');
 
-      // X axis
+      // X axis (left → right, arrow at positive end)
       axesG.append('line').attr('class', 'axis-line')
         .attr('x1', 0).attr('y1', yScale(0))
         .attr('x2', w).attr('y2', yScale(0))
-        .attr('stroke', '#94a3b8').attr('stroke-width', 1.5);
-      // Y axis
+        .attr('stroke', '#94a3b8').attr('stroke-width', 1.5)
+        .attr('marker-end', `url(#arrow-${svgRef.current._id})`);
+      // Y axis (bottom → top, arrow at positive end)
       axesG.append('line').attr('class', 'axis-line')
-        .attr('x1', xScale(0)).attr('y1', 0)
-        .attr('x2', xScale(0)).attr('y2', h)
-        .attr('stroke', '#94a3b8').attr('stroke-width', 1.5);
+        .attr('x1', xScale(0)).attr('y1', h)
+        .attr('x2', xScale(0)).attr('y2', 0)
+        .attr('stroke', '#94a3b8').attr('stroke-width', 1.5)
+        .attr('marker-end', `url(#arrow-${svgRef.current._id})`);
 
       // Tick marks + labels
       const tickG = root.append('g').attr('class', 'ticks');
