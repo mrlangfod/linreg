@@ -34,27 +34,50 @@ function PatternPlane({ targetPoints, placedPoints, onPlaneClick, lineRevealed, 
       const defs = svg.append('defs');
       defs.append('clipPath').attr('id', 'pat-clip')
         .append('rect').attr('x', 0).attr('y', 0).attr('width', w).attr('height', h);
-      const filter = defs.append('filter').attr('id', 'pat-glow');
+
+      // filterUnits="userSpaceOnUse" + fixed region so horizontal lines
+      // (m=0) don't collapse the filter region to zero height.
+      const filter = defs.append('filter').attr('id', 'pat-glow')
+        .attr('filterUnits', 'userSpaceOnUse')
+        .attr('x', -20).attr('y', -20)
+        .attr('width', w + 40).attr('height', h + 40);
       filter.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'coloredBlur');
       const feMerge = filter.append('feMerge');
       feMerge.append('feMergeNode').attr('in', 'coloredBlur');
       feMerge.append('feMergeNode').attr('in', 'SourceGraphic');
 
+      defs.append('marker').attr('id', 'pat-arrow')
+        .attr('viewBox', '0 0 10 10').attr('refX', 10).attr('refY', 5)
+        .attr('markerWidth', 6).attr('markerHeight', 6).attr('orient', 'auto')
+        .append('path').attr('d', 'M 0 0 L 10 5 L 0 10 z').attr('fill', '#94a3b8');
+
       const root = svg.append('g').attr('class', 'root')
         .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
+      // Grid — skip i=0, axis lines cover x=0 and y=0
       d3.range(-AXIS_RANGE, AXIS_RANGE + 1).forEach((i) => {
+        if (i === 0) return;
         const isMajor = i % 5 === 0;
+        const stroke = isMajor ? '#334155' : '#1E293B';
+        const sw = isMajor ? 1 : 0.5;
         root.append('line').attr('class', isMajor ? 'grid-major' : 'grid-minor')
-          .attr('x1', xScale(i)).attr('y1', 0).attr('x2', xScale(i)).attr('y2', h);
+          .attr('x1', xScale(i)).attr('y1', 0).attr('x2', xScale(i)).attr('y2', h)
+          .attr('stroke', stroke).attr('stroke-width', sw);
         root.append('line').attr('class', isMajor ? 'grid-major' : 'grid-minor')
-          .attr('x1', 0).attr('y1', yScale(i)).attr('x2', w).attr('y2', yScale(i));
+          .attr('x1', 0).attr('y1', yScale(i)).attr('x2', w).attr('y2', yScale(i))
+          .attr('stroke', stroke).attr('stroke-width', sw);
       });
 
+      // X axis (left → right, arrow at positive end)
       root.append('line').attr('class', 'axis-line')
-        .attr('x1', 0).attr('y1', yScale(0)).attr('x2', w).attr('y2', yScale(0));
+        .attr('x1', 0).attr('y1', yScale(0)).attr('x2', w).attr('y2', yScale(0))
+        .attr('stroke', '#94a3b8').attr('stroke-width', 2)
+        .attr('marker-end', 'url(#pat-arrow)');
+      // Y axis (bottom → top, arrow at positive end)
       root.append('line').attr('class', 'axis-line')
-        .attr('x1', xScale(0)).attr('y1', 0).attr('x2', xScale(0)).attr('y2', h);
+        .attr('x1', xScale(0)).attr('y1', h).attr('x2', xScale(0)).attr('y2', 0)
+        .attr('stroke', '#94a3b8').attr('stroke-width', 2)
+        .attr('marker-end', 'url(#pat-arrow)');
 
       d3.range(-AXIS_RANGE, AXIS_RANGE + 1).forEach((i) => {
         if (i === 0) return;
